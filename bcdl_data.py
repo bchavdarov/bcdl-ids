@@ -27,6 +27,9 @@ def read_annotations(csv_path):
             records.append((row["imagename"].strip(), row["person"].strip()))
     return records
 
+class BcdlIdsDataset(Dataset):
+    
+
 
 if __name__ == "__main__":
     records = read_annotations("bcdl-faces/annotations.csv")

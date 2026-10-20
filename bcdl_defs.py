@@ -27,7 +27,12 @@ DATA_DIR = Path(os.environ.get("BCDL_DATA_DIR", PROJECT_DIR / "bcdl-faces"))
 ANNOTATIONS_CSV = DATA_DIR / "annotations.csv"
 
 def read_class_names(csv_path):
-    """Return the sorted list of unique person names in annotations.csv."""
+    """Read the unique person names from annotations.csv.
+
+    Returns:
+        list[str]: names sorted alphabetically; the index is the class id,
+        e.g. ['Al Pacino', 'Robert De Niro'].
+    """
     with open(csv_path, newline="", encoding="utf-8") as f:
         return sorted({row["person"].strip() for row in csv.DictReader(f)})
 
