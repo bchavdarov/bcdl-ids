@@ -1,1 +1,3 @@
 bcdl-faces/
+__pycache__/
+*.pyc
