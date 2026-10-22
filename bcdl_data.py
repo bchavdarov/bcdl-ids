@@ -10,6 +10,8 @@ Self-test:
 """
 
 import csv
+from torch.utils.data import Dataset
+
 
 # ---------------------------------------------------------------------------
 # Step 1: read the annotations file
@@ -26,10 +28,21 @@ def read_annotations(csv_path):
         for row in csv.DictReader(f):
             records.append((row["imagename"].strip(), row["person"].strip()))
     return records
-
-class BcdlIdsDataset(Dataset):
     
 
+class BcdlIdsDataset(Dataset):
+    def __init__(self, data, labels, transform=None):
+        self.data = data
+        self.labels = labels
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        sample = self.data[idx]
+        label = self.label[idx]
+        return sample, label
 
 if __name__ == "__main__":
     records = read_annotations("bcdl-faces/annotations.csv")

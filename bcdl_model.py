@@ -1,21 +1,8 @@
-"""
-Custom CNN for recognition of identities, designed for Jetson Nano (JetPack 4.6.1, PyTorch 1.10.0).
-
-Run inside the jetson-inference container:
-    python3 bcdl_model.py ..............  ----- to be adjusted later on finished code
-
-"""
-
 import torch
 import torch.nn as nn
-from bcdl_defs import read_class_names, ANNOTATIONS_CSV
-
-CLASSES = tuple(read_class_names(ANNOTATIONS_CSV))
-NUM_CLASSES = len(CLASSES)
-print(CLASSES)
 
 class BCSimpleCNN(nn.Module):
-    def __init__(self, num_classes=NUM_CLASSES, conv1_out=32):
+    def __init__(self, num_classes=2, conv1_out=32):
         super().__init__()
         c1, c2, c3 = conv1_out, conv1_out * 2, conv1_out * 4
 
@@ -33,6 +20,7 @@ class BCSimpleCNN(nn.Module):
 
             nn.AdaptiveAvgPool2d((4, 4)),  # works for 32x32, 224x224, etc.
         )
+
         self.classifier = nn.Sequential(
             nn.Flatten(),
             nn.Linear(c3 * 4 * 4, 256), nn.ReLU(), nn.Dropout(0.4),
@@ -42,11 +30,3 @@ class BCSimpleCNN(nn.Module):
     def forward(self, x):
         x = self.features(x)
         return self.classifier(x)
-
-if __name__ == "__main__":
-    model = BCSimpleCNN()
-    model.eval()
-    out = model(torch.randn(2, 3, 224, 224))
-    print(out.shape)  # torch.Size([2, 2])
-    print(sum(p.numel() for p in model.parameters()))  # ~665k
-
