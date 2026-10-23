@@ -17,20 +17,21 @@ from torch.utils.data import Dataset
 # Step 1: read the annotations file
 # ---------------------------------------------------------------------------
 
+
 def read_annotations(csv_path):
     """Read annotations.csv and return a list of (imagename, person) pairs.
 
     The CSV must start with a header row naming the columns: imagename,person
     """
-    
+
     records = []
     with open(csv_path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             records.append((row["imagename"].strip(), row["person"].strip()))
     return records
-    
 
-class BcdlIdsDataset(Dataset):
+
+class BCDLDataset(Dataset):
     def __init__(self, data, labels, transform=None):
         self.data = data
         self.labels = labels
@@ -43,6 +44,7 @@ class BcdlIdsDataset(Dataset):
         sample = self.data[idx]
         label = self.label[idx]
         return sample, label
+
 
 if __name__ == "__main__":
     records = read_annotations("bcdl-faces/annotations.csv")

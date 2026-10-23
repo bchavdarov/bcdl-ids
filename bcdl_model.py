@@ -1,5 +1,6 @@
-import torch
+# import torch
 import torch.nn as nn
+
 
 class BCSimpleCNN(nn.Module):
     def __init__(self, num_classes=2, conv1_out=32):
