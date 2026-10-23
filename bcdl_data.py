@@ -10,7 +10,9 @@ Self-test:
 """
 
 import csv
+import os
 from torch.utils.data import Dataset
+from bcdl_defs import ANNOTATIONS_CSV, IMAGE_DIR, load_image
 
 
 # ---------------------------------------------------------------------------
@@ -18,32 +20,30 @@ from torch.utils.data import Dataset
 # ---------------------------------------------------------------------------
 
 
-def read_annotations(csv_path):
-    """Read annotations.csv and return a list of (imagename, person) pairs.
-
-    The CSV must start with a header row naming the columns: imagename,person
-    """
-
-    records = []
-    with open(csv_path, newline="", encoding="utf-8") as f:
+def read_annotations(csv_path=ANNOTATIONS_CSV, image_dir=IMAGE_DIR):
+    """Return samples: [(path, label), ...] read from annotations.csv."""
+    samples = []
+    with open(csv_path, newline='') as f:
         for row in csv.DictReader(f):
-            records.append((row["imagename"].strip(), row["person"].strip()))
-    return records
+            path = os.path.join(image_dir, row['imagename'])
+            samples.append((path, int(row['label'])))
+    return samples
 
 
 class BCDLDataset(Dataset):
-    def __init__(self, data, labels, transform=None):
-        self.data = data
-        self.labels = labels
+    def __init__(self, samples, transform=None):
+        self.samples = samples
         self.transform = transform
 
     def __len__(self):
-        return len(self.data)
+        return len(self.samples)
 
     def __getitem__(self, idx):
-        sample = self.data[idx]
-        label = self.label[idx]
-        return sample, label
+        path, label = self.samples[idx]
+        image = load_image(path)
+        if self.transform:
+            image = self.transform(image)
+        return image, label
 
 
 if __name__ == "__main__":

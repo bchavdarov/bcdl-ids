@@ -17,6 +17,7 @@ Contents:
 import csv
 import os
 from pathlib import Path
+from PIL import Image
 
 # Folder that contains this file, i.e. the project root.
 PROJECT_DIR = Path(__file__).resolve().parent
@@ -25,6 +26,7 @@ PROJECT_DIR = Path(__file__).resolve().parent
 # set the environment variable BCDL_DATA_DIR to use another location.
 DATA_DIR = Path(os.environ.get("BCDL_DATA_DIR", PROJECT_DIR / "bcdl-faces"))
 ANNOTATIONS_CSV = DATA_DIR / "annotations.csv"
+
 
 def read_class_names(csv_path):
     """Read the unique person names from annotations.csv.
@@ -36,3 +38,9 @@ def read_class_names(csv_path):
     with open(csv_path, newline="", encoding="utf-8") as f:
         return sorted({row["person"].strip() for row in csv.DictReader(f)})
 
+
+def load_image(path):
+    image = Image.open(path)
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+    return image
