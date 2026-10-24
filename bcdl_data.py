@@ -12,7 +12,7 @@ Self-test:
 import csv
 import os
 from torch.utils.data import Dataset
-from bcdl_defs import ANNOTATIONS_CSV, IMAGE_DIR, load_image
+from bcdl_defs import ANNOTATIONS_CSV, DATA_DIR, load_image
 
 
 # ---------------------------------------------------------------------------
@@ -20,7 +20,7 @@ from bcdl_defs import ANNOTATIONS_CSV, IMAGE_DIR, load_image
 # ---------------------------------------------------------------------------
 
 
-def read_annotations(csv_path=ANNOTATIONS_CSV, image_dir=IMAGE_DIR):
+def read_annotations(csv_path=ANNOTATIONS_CSV, image_dir=DATA_DIR):
     """Return samples: [(path, label), ...] read from annotations.csv."""
     samples = []
     with open(csv_path, newline='') as f:
