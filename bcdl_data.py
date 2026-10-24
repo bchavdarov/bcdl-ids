@@ -23,10 +23,10 @@ from bcdl_defs import ANNOTATIONS_CSV, DATA_DIR, load_image
 def read_annotations(csv_path=ANNOTATIONS_CSV, image_dir=DATA_DIR):
     """Return samples: [(path, label), ...] read from annotations.csv."""
     samples = []
-    with open(csv_path, newline='') as f:
+    with open(csv_path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            path = os.path.join(image_dir, row['imagename'])
-            samples.append((path, int(row['label'])))
+            path = os.path.join(image_dir, row["imagename"].strip())
+            samples.append((path, int(row["label"])))
     return samples
 
 
@@ -47,7 +47,7 @@ class BCDLDataset(Dataset):
 
 
 if __name__ == "__main__":
-    records = read_annotations("bcdl-faces/annotations.csv")
+    records = read_annotations()
     print(len(records))   # expect 60
-    print(records[0])     # first De Niro image
-    print(records[-1])    # last Pacino image
+    print(records[0])     # first De Niro image, label 1
+    print(records[-1])    # last Pacino image, label 0

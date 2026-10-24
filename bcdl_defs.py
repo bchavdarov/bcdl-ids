@@ -7,11 +7,15 @@ Designed for Jetson Nano (JetPack 4.6.1, PyTorch 1.10.0, Python 3.6)
 and Google Colab.
 
 Contents:
+    DATA_DIR, ANNOTATIONS_CSV
+        Dataset location (override with the BCDL_DATA_DIR env variable).
     read_class_names(csv_path)
-        Read annotations.csv (header: imagename,person) and return the
+        Read annotations.csv (header: imagename,person,label) and return the
         sorted list of unique person names. The sorted order gives each
         identity a stable class index, e.g.
         ['Al Pacino', 'Robert De Niro'] -> 0, 1.
+    load_image(path)
+        Open an image file as an RGB PIL image.
 """
 
 import csv
@@ -28,7 +32,7 @@ DATA_DIR = Path(os.environ.get("BCDL_DATA_DIR", PROJECT_DIR / "bcdl-faces"))
 ANNOTATIONS_CSV = DATA_DIR / "annotations.csv"
 
 
-def read_class_names(csv_path):
+def read_class_names(csv_path=ANNOTATIONS_CSV):
     """Read the unique person names from annotations.csv.
 
     Returns:
@@ -40,7 +44,6 @@ def read_class_names(csv_path):
 
 
 def load_image(path):
-    image = Image.open(path)
-    if image.mode != "RGB":
-        image = image.convert("RGB")
-    return image
+    """Return the image at path as an RGB PIL image (file is closed)."""
+    with Image.open(path) as image:
+        return image.convert("RGB")
