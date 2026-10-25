@@ -1,37 +1,31 @@
 # bcdl-ids
 
-Experimental PyTorch CNN that recognizes a person's identity from a small set of face images. It is being built step by step and targets the NVIDIA Jetson Nano.
-
-**Status:** work in progress. The model, annotation reading and the PyTorch `Dataset` are done. Transforms, training and inference are not written yet.
-
-## Target environment
-
-- Jetson Nano, JetPack 4.6.1, PyTorch 1.10.0, Python 3.6 (inside the `jetson-inference` container)
-- Google Colab for training and experiments
+PyTorch CNN that recognizes a person's identity from face images. Targets the NVIDIA Jetson Nano (JetPack 4.6.1, PyTorch 1.10, Python 3.6, inside the `jetson-inference` container); also runs on a desktop or Colab.
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `bcdl_model.py` | `BCSimpleCNN`: a small CNN (5 conv layers with BatchNorm, then 2 fully connected layers, ~665k parameters). Works with any input size, e.g. 32×32 or 224×224. |
-| `bcdl_data.py` | Data loading: `read_annotations()` returns `(image_path, label)` pairs; `BCDLDataset` serves `(image, label)` samples. |
-| `bcdl_defs.py` | Shared helpers: dataset paths (`DATA_DIR`, overridable with `BCDL_DATA_DIR`), `read_class_names()`, `load_image()`. |
+| File | What it contains |
+|------|------------------|
+| `bcdl_model.py` | `BCSimpleCNN(num_classes, conv1_out)`: 5 conv layers with BatchNorm, then 2 fully connected layers |
+| `bcdl_defs.py` | Shared paths and settings, `get_device()`, `load_image()`, `load_identities()`, `evaluate()` |
+| `bcdl_data.py` | `read_annotations()`, `split_samples()`, `build_transform()`, `BCDLDataset`, `build_dataloaders()` |
+| `bcdl_train.py` | `train_one_epoch()`, `main()`: trains and saves `checkpoints/best_model.pt` |
+| `bcdl_inference.py` | `load_model()`, `predict()`, `main()`: name + confidence for given images |
 
-## Dataset
+## Dataset (`bcdl-faces/`, not committed)
 
-The `bcdl-faces/` folder holds 60 face images (`001.jpeg` … `060.jpeg`): 30 of Robert De Niro and 30 of Al Pacino. It also holds `annotations.csv`, whose rows look like this:
+- `001.jpeg` … `060.jpeg`: 001–030 Robert De Niro, 031–060 Al Pacino
+- `annotations.csv`: `imagename,label`
+- `identities.csv`: `label,name` (0 = Al Pacino, 1 = Robert De Niro). A new person gets the next free number.
 
-```
-imagename,person,label
-001.jpeg,Robert De Niro,1
-```
+Set `BCDL_DATA_DIR` to use a dataset somewhere else.
 
-`label` is the index of `person` in the alphabetically sorted list of names (Al Pacino = 0, Robert De Niro = 1). `bcdl-faces/fgen.py` regenerates the file.
-
-The dataset is not committed (it is listed in `.gitignore`). Put it next to the scripts before running them.
-
-## Quick checks
+## Run
 
 ```bash
-python3 bcdl_data.py    # prints the sample count and the first and last samples
+python3 bcdl_data.py                          # self-test: sample counts and one batch shape
+python3 bcdl_train.py                         # 30 epochs, batch 8, lr 1e-3
+python3 bcdl_inference.py bcdl-faces/045.jpeg
 ```
+
+If the DataLoader crashes inside Docker (bus error / worker killed), add `--num_workers 0`.
